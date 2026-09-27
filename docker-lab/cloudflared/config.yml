@@ -1,0 +1,9 @@
+tunnel: 84093e88-8c6a-4768-a4d8-e1052346a1b2
+credentials-file: /etc/cloudflared/84093e88-8c6a-4768-a4d8-e1052346a1b2.json
+
+ingress:
+  - hostname: web1.anxper.id.vn
+    service: http://nginx:80
+  - hostname: web2.anxper.id.vn
+    service: http://nginx:80
+  - service: http_status:404
