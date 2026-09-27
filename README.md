@@ -5,6 +5,7 @@ Thông tin sinh viên
 * Lớp :K59KMT
 
 
+
 I. Môn An toàn và bảo mật thông tin
 
 1\. Tìm hiểu thuật toán mã hoá hiện đại DES, AES
@@ -176,4 +177,168 @@ Dùng AES với khoá phiên vừa trao đổi để mã hoá toàn bộ dữ li
 
 
 Nhờ vậy hệ thống vừa giải quyết được bài toán trao đổi khoá an toàn (điểm mạnh của RSA), vừa đảm bảo hiệu năng xử lý dữ liệu lớn (điểm mạnh của AES).
+
+
+
+
+
+II. Môn Lập trình Web 
+
+\- Bài tập 1
+
+
+
+&#x20;1. Lý thuyết
+
+
+
+&#x20;1.1. Giả lập Linux OS 
+
+
+
+Ảo hoá (virtualization) là công nghệ cho phép chạy một hệ điều hành (guest OS) bên trong một hệ điều hành khác (host OS) thông qua một lớp trung gian gọi là hypervisor.
+
+
+
+Các công cụ phổ biến:
+
+\- Hyper-V: hypervisor tích hợp sẵn trong Windows (bản Pro/Enterprise), thuộc loại Type-1 (chạy trực tiếp trên phần cứng).
+
+\- VirtualBox / VMware: phần mềm ảo hoá Type-2 (chạy trên nền hệ điều hành host), giao diện quản lý máy ảo trực quan, cài đặt như một OS đầy đủ.
+
+\- WSL (Windows Subsystem for Linux): không phải máy ảo truyền thống, mà là lớp tương thích cho phép chạy trực tiếp các bản phân phối Linux trên Windows. WSL2 (bản hiện tại) sử dụng một nhân Linux thật chạy trong một máy ảo nhẹ (lightweight VM) dựa trên nền tảng Hyper-V, nhưng được tích hợp sâu vào Windows (chia sẻ mạng, ổ đĩa, tài nguyên linh hoạt hơn máy ảo thông thường).
+
+
+
+Em chọn WSL2 cho bài tập này vì: nhẹ hơn, khởi động nhanh hơn máy ảo đầy đủ, tích hợp trực tiếp với Docker Desktop, không cần cấp phát cứng RAM/CPU cố định như VirtualBox/VMware.
+
+
+
+1.2. Docker và Docker Compose
+
+
+
+\- Docker: nền tảng ảo hoá ở mức container (container hoá) - đóng gói ứng dụng cùng toàn bộ môi trường chạy (thư viện, cấu hình) vào một "container", chạy độc lập, nhẹ hơn máy ảo vì các container dùng chung nhân hệ điều hành host thay vì mô phỏng phần cứng riêng.
+
+\- Docker Image: bản mẫu (template) chỉ đọc, dùng để tạo container.
+
+\- Docker Compose: công cụ định nghĩa và chạy đồng thời nhiều container liên quan tới nhau (multi-container application) bằng một file cấu hình duy nhất viết theo cú pháp YAML (`docker-compose.yml`), thay vì phải chạy từng lệnh `docker run` riêng lẻ cho mỗi dịch vụ.
+
+
+
+1.3. Các dịch vụ triển khai trên Docker Compose
+
+
+
+| Dịch vụ | Vai trò |
+
+|---|---|
+
+| \*\*Nginx\*\* | Web server / reverse proxy hiệu năng cao, dùng để phục vụ nội dung tĩnh và định tuyến request tới đúng dịch vụ backend dựa theo domain (virtual hosting) |
+
+| \*\*Node-RED\*\* | Công cụ lập trình trực quan dạng kéo-thả (flow-based programming), thường dùng cho IoT và tự động hoá; có thể tạo API HTTP đơn giản bằng cặp node `http in` (nhận request) và `http response` (trả kết quả) |
+
+| \*\*MariaDB\*\* | Hệ quản trị cơ sở dữ liệu quan hệ mã nguồn mở, là một nhánh phát triển tương thích của MySQL |
+
+| \*\*phpMyAdmin\*\* | Công cụ quản trị MySQL/MariaDB qua giao diện web, cho phép xem/sửa dữ liệu, chạy truy vấn SQL trực quan mà không cần dùng dòng lệnh |
+
+| \*\*Cloudflared\*\* | Client của \*\*Cloudflare Tunnel\*\*, tạo một đường hầm (tunnel) mã hoá từ máy cục bộ ra internet thông qua hạ tầng Cloudflare, cho phép truy cập dịch vụ chạy trong mạng nội bộ (localhost) từ domain thật công khai mà \*\*không cần mở port trên router/firewall\*\* |
+
+
+
+1.4. Cấu hình Nginx phục vụ nhiều domain (Virtual Hosting)
+
+
+
+Nginx cho phép một server vật lý/container duy nhất phục vụ nhiều website khác nhau bằng cơ chế server block (tương đương "virtual host" ở Apache). Mỗi server { ... } trong file cấu hình định nghĩa:
+
+\- listen: cổng lắng nghe (thường là 80 cho HTTP, 443 cho HTTPS)
+
+\- server\_name: tên miền mà block này sẽ xử lý
+
+\- root/index: thư mục và file mặc định phục vụ cho domain đó
+
+
+
+Khi có request tới, Nginx đọc header Host trong HTTP request để xác định request đó thuộc domain nào, từ đó chọn đúng server block tương ứng để xử lý - đây là cách 1 con Nginx duy nhất chạy được nhiều website với domain khác nhau.
+
+
+
+2\. Hướng dẫn thực hiện
+
+
+
+2.1. Cài đặt môi trường Linux (WSL2)
+
+
+
+```powershell
+
+wsl --install
+
+```
+
+Khởi động lại máy, tạo username/password cho Ubuntu khi được yêu cầu. Kiểm tra phiên bản WSL:
+
+```powershell
+
+wsl -l -v
+
+```
+
+
+
+2.2. Cài Docker Desktop và tích hợp WSL2
+
+
+
+\- Tải và cài Docker Desktop for Windows (chọn đúng bản theo máy)
+
+\- Vào Settings → Resources → WSL Integration, bật tích hợp cho Ubuntu
+
+\- Kiểm tra trong Ubuntu:
+
+```bash
+
+docker --version
+
+docker compose version
+
+```
+
+
+
+2.3. Viết file docker-compose.yml
+
+
+
+Khai báo 5 dịch vụ (nginx, nodered, mariadb, phpmyadmin, cloudflared), mỗi dịch vụ gồm: image (phiên bản dùng), ports (ánh xạ cổng), volumes (lưu trữ dữ liệu/cấu hình), networks (mạng nội bộ dùng chung giữa các container để chúng gọi được lẫn nhau qua tên service).
+
+
+
+2.4. Cấu hình Nginx cho 2 website/domain khác nhau
+
+
+
+Tạo 2 file cấu hình riêng trong nginx/conf.d/ (site1.conf, site2.conf), mỗi file 1 server block với server\_name là domain riêng , trỏ tới 2 thư mục nội dung HTML khác nhau.
+
+
+
+2.5. Thiết lập Cloudflare Tunnel với domain thật
+
+
+
+1\. Đăng nhập cloudflared, xác thực domain qua trình duyệt (cloudflared tunnel login)
+
+2\. Tạo tunnel (cloudflared tunnel create), lấy Tunnel ID
+
+3\. Viết file config.yml khai báo ánh xạ domain → dịch vụ nội bộ (ingress)
+
+4\. Trỏ DNS 2 subdomain về tunnel (cloudflared tunnel route dns)
+
+5\. Khai báo container cloudflared trong docker-compose.yml, chạy bằng chính file config.yml đó
+
+
+
+
 
