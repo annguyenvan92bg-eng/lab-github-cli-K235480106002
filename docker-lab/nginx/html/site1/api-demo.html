@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo goi API danh sach sach</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        table { border-collapse: collapse; width: 100%; max-width: 600px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Danh sach sach </h1>
+    <div id="result">Dang tai du lieu...</div>
+
+    <script>
+        fetch('/api/sach')
+            .then(response => response.json())
+            .then(data => {
+                let html = '<p>' + data.msg + ' - Tong so sach: ' + data.tong_so_sach + '</p>';
+                html += '<table>';
+                html += '<tr><th>Ten sach</th><th>Gia (VND)</th><th>Ton kho</th></tr>';
+                data.danh_sach_sach.forEach(sach => {
+                    html += '<tr><td>' + sach.ten_sach + '</td><td>' + sach.gia.toLocaleString('vi-VN') + '</td><td>' + sach.ton_kho + '</td></tr>';
+                });
+                html += '</table>';
+                document.getElementById('result').innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('result').innerHTML = 'Loi khi goi API: ' + err;
+            });
+    </script>
+</body>
+</html>

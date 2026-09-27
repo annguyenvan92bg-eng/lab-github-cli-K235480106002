@@ -1,0 +1,58 @@
+[
+    {
+        "id": "flow2",
+        "type": "tab",
+        "label": "API Sach",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "http_in_sach",
+        "type": "http in",
+        "z": "flow2",
+        "name": "GET /api/sach",
+        "url": "/api/sach",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 160,
+        "wires": [
+            [
+                "build_response_sach"
+            ]
+        ]
+    },
+    {
+        "id": "build_response_sach",
+        "type": "function",
+        "z": "flow2",
+        "name": "Build JSON response",
+        "func": "msg.payload = {\n    ok: 1,\n    msg: \"lay danh sach sach thanh cong\",\n    tong_so_sach: 3,\n    danh_sach_sach: [\n        { ten_sach: \"Lap trinh C++\", gia: 120000, ton_kho: 15 },\n        { ten_sach: \"Co so du lieu MySQL\", gia: 95000, ton_kho: 8 },\n        { ten_sach: \"Toan 12\", gia: 150000, ton_kho: 20 }\n    ]\n};\nmsg.headers = { \"content-type\": \"application/json\" };\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 160,
+        "wires": [
+            [
+                "http_response_sach"
+            ]
+        ]
+    },
+    {
+        "id": "http_response_sach",
+        "type": "http response",
+        "z": "flow2",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 640,
+        "y": 160,
+        "wires": []
+    }
+]
