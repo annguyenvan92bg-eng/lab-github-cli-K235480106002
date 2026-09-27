@@ -333,7 +333,18 @@ Tạo 2 file cấu hình riêng trong nginx/conf.d/ (site1.conf, site2.conf), m�
 
 5\. Khai báo container cloudflared trong docker-compose.yml, chạy bằng chính file config.yml đó
 
+ .6. Khởi động và kiểm tra
 
+```bash
+docker compose up -d
+docker compose ps
+```
 
+<img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/d5574889-3b4b-4652-96eb-87a0bbb014fc" />
+*Ảnh hiển thị kết quả các dịch vụ đã hoạt động đúng
+Sau đó truy cập thử vào các trang web theo tên miền đã cài đặt
+<img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/b1b08250-f0c3-45fd-a7cd-94eee8ff0e3b" />
+<img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/8b2f95eb-bf82-4657-bec4-9a476e64f4a2" />
+*Kết quả hai trang web với 2 domain khác nhau đã chạy đúng cấu hình nginx
 
 
