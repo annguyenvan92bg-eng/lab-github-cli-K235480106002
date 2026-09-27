@@ -86,11 +86,11 @@ Cách chạy:
 
 
 
-bash
-
 pip install pycryptodome
 
 python aes\_demo.py
+<img width="2560" height="1600" alt="Ảnh chụp màn hình 2026-09-26 160050" src="https://github.com/user-attachments/assets/3ef97a50-7c2b-476e-8339-2fac2184c8a8" />
+*Ảnh kết quả chạy file demo thuật toán aes
 
 2\. Tìm hiểu thuật toán mã hoá bất đối xứng RSA
 
