@@ -228,22 +228,17 @@ Em chọn WSL2 cho bài tập này vì: nhẹ hơn, khởi động nhanh hơn m�
 
 1.3. Các dịch vụ triển khai trên Docker Compose
 
+Dịch vụ và vai trò
 
+- Nginx: Web server / reverse proxy hiệu năng cao, dùng để phục vụ nội dung tĩnh và định tuyến request tới đúng dịch vụ backend dựa theo domain (virtual hosting) 
 
-| Dịch vụ | Vai trò |
+- Node-RED :Công cụ lập trình trực quan dạng kéo-thả (flow-based programming), thường dùng cho IoT và tự động hoá; có thể tạo API HTTP đơn giản bằng cặp node `http in` (nhận request) và `http response` (trả kết quả) 
 
-|---|---|
+- MariaDB : Hệ quản trị cơ sở dữ liệu quan hệ mã nguồn mở, là một nhánh phát triển tương thích của MySQL 
 
-| \*\*Nginx\*\* | Web server / reverse proxy hiệu năng cao, dùng để phục vụ nội dung tĩnh và định tuyến request tới đúng dịch vụ backend dựa theo domain (virtual hosting) |
+- phpMyAdmin: Công cụ quản trị MySQL/MariaDB qua giao diện web, cho phép xem/sửa dữ liệu, chạy truy vấn SQL trực quan mà không cần dùng dòng lệnh 
 
-| \*\*Node-RED\*\* | Công cụ lập trình trực quan dạng kéo-thả (flow-based programming), thường dùng cho IoT và tự động hoá; có thể tạo API HTTP đơn giản bằng cặp node `http in` (nhận request) và `http response` (trả kết quả) |
-
-| \*\*MariaDB\*\* | Hệ quản trị cơ sở dữ liệu quan hệ mã nguồn mở, là một nhánh phát triển tương thích của MySQL |
-
-| \*\*phpMyAdmin\*\* | Công cụ quản trị MySQL/MariaDB qua giao diện web, cho phép xem/sửa dữ liệu, chạy truy vấn SQL trực quan mà không cần dùng dòng lệnh |
-
-| \*\*Cloudflared\*\* | Client của \*\*Cloudflare Tunnel\*\*, tạo một đường hầm (tunnel) mã hoá từ máy cục bộ ra internet thông qua hạ tầng Cloudflare, cho phép truy cập dịch vụ chạy trong mạng nội bộ (localhost) từ domain thật công khai mà \*\*không cần mở port trên router/firewall\*\* |
-
+- Cloudflared: Client của Cloudflare Tunnel, tạo một đường hầm (tunnel) mã hoá từ máy cục bộ ra internet thông qua hạ tầng Cloudflare, cho phép truy cập dịch vụ chạy trong mạng nội bộ (localhost) từ domain thật công khai mà không cần mở port trên router/firewall
 
 
 1.4. Cấu hình Nginx phục vụ nhiều domain (Virtual Hosting)
