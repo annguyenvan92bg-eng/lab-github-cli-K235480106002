@@ -348,3 +348,67 @@ Sau đó truy cập thử vào các trang web theo tên miền đã cài đặt
 *Kết quả hai trang web với 2 domain khác nhau đã chạy đúng cấu hình nginx
 
 
+---
+
+- Bài tập 2
+
+1. Lý thuyết
+
+1.1. Node-RED 
+
+Node-RED là công cụ lập trình trực quan, xây dựng ứng dụng bằng cách kéo-thả và nối các "node" (khối chức năng) lại thành một "flow" (luồng xử lý), thay vì viết code tuần tự truyền thống. Mỗi node đảm nhiệm một nhiệm vụ nhỏ (nhận request, xử lý dữ liệu, gọi API khác, trả kết quả...), dữ liệu (gọi là `msg`) được truyền từ node này sang node kế tiếp qua các dây nối (wires).
+
+1.2. Tạo API bằng cặp node `http in` + `http response`
+
+- `http in`: node lắng nghe một HTTP endpoint cụ thể (khai báo `method` - GET/POST/... và `url` - đường dẫn), đóng vai trò tương đương route/endpoint trong các framework backend truyền thống (Express, Flask...). Khi có request khớp, node này nhận request và chuyển tiếp `msg` sang node kế tiếp trong flow.
+- `function` (node trung gian, tuỳ chọn): cho phép viết đoạn code JavaScript ngắn để xử lý logic, xây dựng dữ liệu trả về, gán vào `msg.payload`.
+- `http response`: node cuối flow, lấy `msg.payload` và trả về cho client dưới dạng HTTP response. Nếu `msg.payload` là object JavaScript, Node-RED tự động chuyển thành JSON khi trả về (kèm header `Content-Type: application/json` nếu được khai báo trong `msg.headers`).
+
+	Quy trình xử lý 1 request: Client gửi HTTP request → node `http in` bắt được request theo đúng `method` + `url` khai báo → dữ liệu chuyển qua node `function` để xử lý/tạo nội dung trả về → node `http response` gửi kết quả JSON về lại client.
+
+1.3. Nginx đóng vai trò Reverse Proxy cho API
+
+	Reverse Proxy là mô hình trong đó server trung gian (ở đây là Nginx) nhận request từ client, rồi chuyển tiếp (forward) request đó tới một server backend khác (ở đây là Node-RED), sau đó trả kết quả ngược lại cho client — toàn bộ quá trình này client không biết (và không cần biết) backend thật sự nằm ở đâu.
+
+Trong bài tập, cấu hình `location /api/ { proxy_pass http://nodered:1880/api/; ... }` giúp:
+- Client chỉ cần gọi tới domain chính (`web1.anxper.id.vn/api/...`), không cần biết cổng `1880` hay tên container `nodered`
+- Ẩn cấu trúc hạ tầng bên trong (chỉ Nginx là điểm truy cập công khai duy nhất)
+- Cho phép mở rộng sau này (thêm cache, giới hạn tốc độ request - rate limiting, SSL...) mà không cần sửa code backend
+
+`proxy_set_header Host $host;` và `proxy_set_header X-Real-IP $remote_addr;` giúp giữ lại thông tin gốc của request (domain, địa chỉ IP client thật) khi chuyển tiếp qua Node-RED, tránh backend nhận nhầm là request đến từ chính Nginx.
+
+1.4. Gọi API từ JavaScript bằng Fetch API
+
+`fetch()` là hàm có sẵn trong JavaScript (chạy trên trình duyệt), dùng để gửi HTTP request bất đồng bộ (asynchronous) tới một địa chỉ (URL) mà không cần tải lại trang (AJAX). Quy trình xử lý:
+
+1. `fetch('/api/sach')` gửi HTTP GET request tới endpoint đó
+2. `.then(response => response.json())` nhận response, chuyển phần thân (body) từ dạng text sang object JavaScript (parse JSON)
+3. `.then(data => { ... })` nhận được object dữ liệu, từ đó xử lý và cập nhật giao diện (ở đây là build bảng HTML từ mảng `data.danh_sach_sach`)
+4. `.catch(err => { ... })` bắt lỗi nếu quá trình gọi API thất bại (mất mạng, server lỗi...)
+
+2. Hướng dẫn thực hiện
+
+2.1. Tạo API bằng Node-RED
+
+1. Vào giao diện Node-RED (`http://localhost:1880`)
+2. Kéo node `http in` vào canvas, cấu hình: method `GET`, url `/api/sach`
+3. Kéo node `function` vào, nối tiếp sau `http in`, viết code JavaScript gán `msg.payload` là object chứa danh sách sách (tên, giá, tồn kho)
+4. Kéo node `http response` vào, nối tiếp sau `function`
+5. Bấm Deploy để kích hoạt flow
+
+2.2. Cấu hình Nginx proxy API
+
+Thêm block `location /api/` vào file cấu hình site, trỏ `proxy_pass` về địa chỉ nội bộ của Node-RED trong cùng Docker network (`http://nodered:1880/`), sử dụng đúng tên service khai báo trong `docker-compose.yml` (Docker DNS tự phân giải tên service thành địa chỉ IP container tương ứng).
+
+2.3. Viết trang HTML dùng JavaScript gọi API
+
+Tạo file HTML tĩnh, dùng `fetch()` gọi tới endpoint `/api/sach` (đường dẫn tương đối, tự động gọi đúng domain hiện tại của trang), nhận dữ liệu JSON, dựng thành bảng HTML hiển thị cho người dùng.
+
+2.4. Kiểm tra kết quả
+
+- Gọi trực tiếp API qua domain thật: `https://web1.anxper.id.vn/api/sach` → xác nhận trả về đúng JSON
+- Mở trang demo: `https://web1.anxper.id.vn/api-demo.html` → xác nhận bảng dữ liệu hiển thị đúng, khớp với dữ liệu API trả về
+
+
+
+
