@@ -396,6 +396,8 @@ Trong bài tập, cấu hình `location /api/ { proxy_pass http://nodered:1880/a
 4. Kéo node `http response` vào, nối tiếp sau `function`
 5. Bấm Deploy để kích hoạt flow
 
+<img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/3edabf1d-9507-4511-a6c9-a635a82cca20" />
+
 2.2. Cấu hình Nginx proxy API
 
 Thêm block `location /api/` vào file cấu hình site, trỏ `proxy_pass` về địa chỉ nội bộ của Node-RED trong cùng Docker network (`http://nodered:1880/`), sử dụng đúng tên service khai báo trong `docker-compose.yml` (Docker DNS tự phân giải tên service thành địa chỉ IP container tương ứng).
@@ -407,7 +409,12 @@ Tạo file HTML tĩnh, dùng `fetch()` gọi tới endpoint `/api/sach` (đườ
 2.4. Kiểm tra kết quả
 
 - Gọi trực tiếp API qua domain thật: `https://web1.anxper.id.vn/api/sach` → xác nhận trả về đúng JSON
+
+  <img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/b6314c2a-98bf-45c1-80bb-795a763923c2" />
+  * Ảnh kết quả trả về JSON 
 - Mở trang demo: `https://web1.anxper.id.vn/api-demo.html` → xác nhận bảng dữ liệu hiển thị đúng, khớp với dữ liệu API trả về
+<img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/9f65469c-086c-4824-b21b-db45858937fe" />
+* Ảnh kết quả trang web đã hiện đúng API trả về
 
 
 
