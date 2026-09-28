@@ -414,6 +414,7 @@ Tạo file HTML tĩnh, dùng `fetch()` gọi tới endpoint `/api/sach` (đườ
   * Ảnh kết quả trả về JSON 
 - Mở trang demo: `https://web1.anxper.id.vn/api-demo.html` → xác nhận bảng dữ liệu hiển thị đúng, khớp với dữ liệu API trả về
 <img width="945" height="591" alt="image" src="https://github.com/user-attachments/assets/9f65469c-086c-4824-b21b-db45858937fe" />
+
 * Ảnh kết quả trang web đã hiện đúng API trả về
 
 
